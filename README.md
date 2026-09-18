@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Zap Thoung Café — POS
 
-## Getting Started
+A point-of-sale console for Zap Thoung Café: admin login, a live dashboard, menu
+management, and an order/POS screen — built with Next.js (App Router), Prisma, and
+SQLite.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router, Server Actions, Turbopack)
+- **Prisma 6** + **SQLite** (file-based DB, zero config — swap the datasource for
+  Postgres/MySQL later without touching app code)
+- Custom cookie-based auth (`bcryptjs` + `jose` JWT), no third-party auth service
+- Tailwind CSS v4, hand-rolled UI primitives (no component library dependency)
+- `recharts` for the dashboard revenue chart
+
+## Getting started
 
 ```bash
+npm install
+npx prisma migrate dev   # creates prisma/dev.db and applies the schema
+npm run db:seed          # seeds the full Zap Thoung menu + an admin user
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) — you'll be redirected to `/login`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Default admin login
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Seeded from `.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`):
 
-## Learn More
+- **Email:** `hassantahir0000@gmail.com`
+- **Password:** `ZapThoung@2026`
 
-To learn more about Next.js, take a look at the following resources:
+Change `SEED_ADMIN_PASSWORD` in `.env` and re-run `npm run db:seed` to update it, or
+just change your password by editing the user in Prisma Studio (`npm run db:studio`).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Change `AUTH_SECRET` in `.env` before deploying anywhere real** — it signs the
+session cookie.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project structure
 
-## Deploy on Vercel
+- `src/app/(app)/dashboard` — stats, revenue trend, top sellers, recent orders
+- `src/app/(app)/pos` — the order-taking screen (menu grid + cart)
+- `src/app/(app)/orders` — order list + per-order detail/receipt with status flow
+- `src/app/(app)/menu` — category & menu item CRUD with price variants
+- `src/lib/actions` — Server Actions (auth, menu, orders) — all writes go through
+  these, never through client-side fetches to hand-rolled API routes
+- `prisma/schema.prisma` — data model
+- `prisma/seed.ts` — seeds categories, items, price variants, and the admin user
+  from the photographed menu
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Notes on the data model
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Menu items can have multiple price variants (e.g. Small/Medium/Large, Single/Family,
+6 pcs/12 pcs, or a single "Regular" price) — see `MenuItemVariant` in the schema.
+Orders snapshot the item name, variant label, and unit price at the time of sale, so
+renaming or repricing a menu item later doesn't change historical order totals.
+
+## Scripts
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the dev server |
+| `npm run build` / `npm run start` | Production build / start |
+| `npm run db:migrate` | Run Prisma migrations |
+| `npm run db:seed` | Seed the menu + admin user |
+| `npm run db:studio` | Open Prisma Studio to browse/edit data |
+| `npm run lint` | ESLint |

@@ -1,26 +1,150 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f5f2;
+  --foreground: #1c1712;
+
+  --surface: #ffffff;
+  --surface-muted: #f1eee8;
+  --border: #e6e1d8;
+
+  --ink: #1c1712;
+  --ink-soft: #6b6258;
+
+  --brand: #e2431e;
+  --brand-dark: #b83414;
+  --brand-soft: #fdece6;
+
+  --accent: #1c1712;
+  --accent-foreground: #ffffff;
+
+  --success: #1a7f4b;
+  --success-soft: #e6f5ec;
+  --warning: #b8790a;
+  --warning-soft: #fdf1dc;
+  --danger: #c22626;
+  --danger-soft: #fbe6e6;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-soft: var(--brand-soft);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+* {
+  border-color: var(--border);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d8d2c6;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c6bfae;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.15s ease-out;
+}
+
+/*
+ * Tuned for 80mm thermal receipt printers (e.g. SpeedX SP-90A and similar
+ * USB/Wi-Fi/Bluetooth models). Most of these install as a normal system
+ * printer over USB, so the browser's print dialog can target them directly
+ * as long as the page is sized to the roll width instead of A4/Letter.
+ */
+@page {
+  size: 80mm auto;
+  margin: 0;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #receipt,
+  #receipt * {
+    visibility: visible;
+  }
+  #receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 72mm;
+    margin: 0 auto;
+    padding: 2mm 3mm;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: #fff;
+    color: #000;
+    font-family: "Courier New", "Courier", monospace;
+    font-size: 11px;
+    line-height: 1.35;
+  }
+  #receipt * {
+    color: #000 !important;
+    background: transparent !important;
+    border-color: #000 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  #receipt table {
+    font-size: 10.5px;
+  }
+  #receipt .receipt-badge {
+    padding: 0 !important;
+    font-weight: 700;
+  }
+  #receipt .receipt-badge::before {
+    content: "[";
+  }
+  #receipt .receipt-badge::after {
+    content: "]";
+  }
 }

@@ -43,39 +43,33 @@ export async function createOrder(input: unknown): Promise<CreateOrderResult> {
   const total = Math.max(subtotal + tax - data.discount, 0);
 
   try {
-    const order = await prisma.$transaction(async (tx) => {
-      const last = await tx.order.findFirst({ orderBy: { orderNumber: "desc" }, select: { orderNumber: true } });
-      const nextOrderNumber = (last?.orderNumber ?? 1000) + 1;
-
-      return tx.order.create({
-        data: {
-          orderNumber: nextOrderNumber,
-          type: data.type,
-          tableNumber: data.tableNumber || null,
-          customerName: data.customerName || null,
-          customerPhone: data.customerPhone || null,
-          notes: data.notes || null,
-          subtotal,
-          discount: data.discount,
-          tax,
-          total,
-          paymentMethod: data.paymentMethod,
-          paymentStatus: data.paymentStatus,
-          createdById: session?.userId,
-          status: "PENDING",
-          items: {
-            create: data.items.map((i) => ({
-              menuItemId: i.menuItemId,
-              variantId: i.variantId,
-              itemName: i.itemName,
-              variantLabel: i.variantLabel,
-              unitPrice: i.unitPrice,
-              quantity: i.quantity,
-              subtotal: i.unitPrice * i.quantity,
-            })),
-          },
+    const order = await prisma.order.create({
+      data: {
+        type: data.type,
+        tableNumber: data.tableNumber || null,
+        customerName: data.customerName || null,
+        customerPhone: data.customerPhone || null,
+        notes: data.notes || null,
+        subtotal,
+        discount: data.discount,
+        tax,
+        total,
+        paymentMethod: data.paymentMethod,
+        paymentStatus: data.paymentStatus,
+        createdById: session?.userId,
+        status: "PENDING",
+        items: {
+          create: data.items.map((i) => ({
+            menuItemId: i.menuItemId,
+            variantId: i.variantId,
+            itemName: i.itemName,
+            variantLabel: i.variantLabel,
+            unitPrice: i.unitPrice,
+            quantity: i.quantity,
+            subtotal: i.unitPrice * i.quantity,
+          })),
         },
-      });
+      },
     });
 
     revalidatePath("/orders");

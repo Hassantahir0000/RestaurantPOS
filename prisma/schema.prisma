@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -85,7 +85,7 @@ enum PaymentStatus {
 
 model Order {
   id              String        @id @default(cuid())
-  orderNumber     Int           @unique
+  orderNumber     Int           @unique @default(autoincrement())
   type            OrderType     @default(DINE_IN)
   status          OrderStatus   @default(PENDING)
   tableNumber     String?

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Minus, Plus, Trash2, Loader2, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -39,10 +39,27 @@ export function CartPanel({
   const [paymentMethod, setPaymentMethod] = useState<"CASH" | "CARD" | "ONLINE">("CASH");
   const [paymentStatus, setPaymentStatus] = useState<"PAID" | "UNPAID">("UNPAID");
   const [pending, startTransition] = useTransition();
+  const listRef = useRef<HTMLDivElement>(null);
+  const [canScrollUp, setCanScrollUp] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(false);
 
   const subtotal = useMemo(() => cart.reduce((sum, l) => sum + l.unitPrice * l.quantity, 0), [cart]);
   const discountValue = Number(discount) || 0;
   const total = Math.max(subtotal - discountValue, 0);
+
+  function updateScrollShadows() {
+    const el = listRef.current;
+    if (!el) return;
+    setCanScrollUp(el.scrollTop > 4);
+    setCanScrollDown(el.scrollTop + el.clientHeight < el.scrollHeight - 4);
+  }
+
+  useEffect(() => {
+    // The scroll container's own box size never changes (it's fixed by the
+    // flex layout) — only its content's scrollHeight does as cart lines are
+    // added/removed, which ResizeObserver on the container won't report.
+    updateScrollShadows();
+  }, [cart]);
 
   function handleSubmit() {
     if (cart.length === 0) {
@@ -133,7 +150,14 @@ export function CartPanel({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="relative min-h-0 flex-1">
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-x-0 top-0 z-10 h-6 bg-linear-to-b from-surface to-transparent transition-opacity",
+            canScrollUp ? "opacity-100" : "opacity-0"
+          )}
+        />
+        <div ref={listRef} onScroll={updateScrollShadows} className="h-full overflow-y-auto p-4">
         {cart.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-center text-ink-soft">
             <ShoppingCart className="mb-2 h-8 w-8 opacity-30" />
@@ -175,6 +199,13 @@ export function CartPanel({
             ))}
           </ul>
         )}
+        </div>
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-x-0 bottom-0 z-10 h-6 bg-linear-to-t from-surface to-transparent transition-opacity",
+            canScrollDown ? "opacity-100" : "opacity-0"
+          )}
+        />
       </div>
 
       <div className="space-y-3 border-t border-border p-4">

@@ -193,7 +193,7 @@ export function MenuManager({ categories }: { categories: CategoryWithItems[] })
                   </div>
                   {!item.available && (
                     <Badge variant="danger">
-                      <EyeOff className="h-3 w-3" /> 86&apos;d
+                      <EyeOff className="h-3 w-3" /> Unavailable
                     </Badge>
                   )}
                 </div>
@@ -215,7 +215,7 @@ export function MenuManager({ categories }: { categories: CategoryWithItems[] })
                     Edit
                   </Button>
                   <Button variant="subtle" size="sm" onClick={() => handleToggleAvailability(item)}>
-                    {item.available ? "86 it" : "Restore"}
+                    {item.available ? "Mark unavailable" : "Mark available"}
                   </Button>
                   <Button variant="ghost" size="icon" onClick={() => handleDeleteItem(item)}>
                     <Trash2 className="h-4 w-4 text-danger" />

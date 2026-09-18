@@ -108,7 +108,7 @@ export function ItemFormModal({
               onChange={(e) => setAvailable(e.target.value === "true")}
             >
               <option value="true">Available</option>
-              <option value="false">86&apos;d (unavailable)</option>
+              <option value="false">Unavailable</option>
             </Select>
           </div>
         </div>

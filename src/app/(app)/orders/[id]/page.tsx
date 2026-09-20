@@ -25,22 +25,18 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       </Link>
 
       <div id="receipt" className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
-        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-dashed border-border pb-4">
-          <div>
-            <h1 className="text-xl font-bold text-ink">Zap Thoung Café</h1>
-            <p className="text-sm text-ink-soft">Order #{order.orderNumber}</p>
-            <p className="text-xs text-ink-soft">{formatDateTime(order.createdAt)}</p>
+        <div className="border-b border-dashed border-border pb-4 text-center">
+          <h1 className="text-xl font-bold text-ink">Zap Thoung Café</h1>
+          <p className="text-sm text-ink-soft">Order #{order.orderNumber}</p>
+          <p className="text-xs text-ink-soft">{formatDateTime(order.createdAt)}</p>
+          <div className="mt-2 flex justify-center gap-2">
+            <OrderTypeBadge type={order.type} />
+            <OrderStatusBadge status={order.status} />
           </div>
-          <div className="flex flex-col items-end gap-2">
-            <div className="flex gap-2">
-              <OrderTypeBadge type={order.type} />
-              <OrderStatusBadge status={order.status} />
-            </div>
-            <p className="text-xs text-ink-soft">
-              {order.customerName || (order.tableNumber ? `Table ${order.tableNumber}` : "Walk-in")}
-              {order.customerPhone ? ` · ${order.customerPhone}` : ""}
-            </p>
-          </div>
+          <p className="mt-2 text-xs text-ink-soft">
+            {order.customerName || (order.tableNumber ? `Table ${order.tableNumber}` : "Walk-in")}
+            {order.customerPhone ? ` · ${order.customerPhone}` : ""}
+          </p>
         </div>
 
         <table className="mt-4 w-full text-sm">
